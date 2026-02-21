@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "schema": "rolling_showcase_graph_v0.3",
+    "window": {
+      "start_date": "YYYY-MM-DD",
+      "end_date": "YYYY-MM-DD",
+      "granularity_mode": "dense | normal | compressed"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "string_id",
+      "type": "group | project | thread",
+      "title": "Извлечённое или нейтральное название узла",
+      "status": "in_progress | completed | paused",
+      "actional_depth": "high | medium | low",
+      "summary": "1–3 предложения о сути узла в рамках окна",
+
+      "parent_id": "string_id | null",
+      "active_range": { "start": "YYYY-MM-DD", "end": "YYYY-MM-DD" },
+
+      "aliases": [
+        { "title": "старое/альтернативное имя", "from": "YYYY-MM-DD", "to": "YYYY-MM-DD" }
+      ]
+    }
+  ],
+
+  "relations": [
+    {
+      "type": "predecessor_of | merged_into | split_into | renamed_to | absorbed_into | related_to",
+      "from": "node_id",
+      "to": "node_id",
+      "date": "YYYY-MM-DD | null",
+      "confidence": "high | medium | low",
+      "note": "1 фраза, почему связь проведена"
+    }
+  ],
+
+  "days": [
+    {
+      "date": "YYYY-MM-DD",
+      "entries": [
+        {
+          "node_id": "node_id",
+          "phase": "initiation | active_development | refactoring | finalization",
+          "events": [
+            "Сжатые события дня по этому узлу (без потери смысла)"
+          ]
+        },
+        {
+          "type": "orphan",
+          "events": [
+            "События дня, которые пока нельзя уверенно привязать к узлу"
+          ]
+        }
+      ]
+    }
+  ]
+}
