@@ -1,16 +1,41 @@
-# React + Vite
+# Rolling Showcase Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Локальное React + Vite приложение для просмотра JSON формата `rolling_showcase_graph_v0.3`.
 
-Currently, two official plugins are available:
+## Что умеет MVP
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Загружает **один JSON-файл** через File Picker (`input type="file"`).
+- Валидирует обязательные поля (`meta`, `nodes`, `relations`, `days`, `meta.window`).
+- Показывает Dashboard:
+  - окно `meta.window` (start/end/granularity),
+  - дерево узлов по `parent_id`,
+  - детали выбранного узла (`summary`, `status`, `actional_depth`, `active_range`, `aliases`),
+  - связи выбранного узла из `relations`,
+  - таймлайн по дням с `entries` и блоком `orphan`.
+- Поддерживает фильтрацию таймлайна при выборе узла.
+- Не сохраняет данные между сессиями и не вызывает внешние API.
 
-## React Compiler
+## Запуск
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+Откройте URL из консоли Vite (обычно `http://localhost:5173`).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Использование
+
+1. На стартовом экране нажмите **«Выбрать JSON файл»**.
+2. Выберите файл схемы `rolling_showcase_graph_v0.3`.
+3. После загрузки используйте:
+   - левую панель для выбора узла,
+   - правую панель (таймлайн) для просмотра событий по дням,
+   - кнопку **«Сбросить»** для снятия фильтра узла,
+   - кнопку **«Загрузить другой файл»** для новой загрузки.
+
+## Ограничения
+
+- Валидация минимальная и проверяет только ключевые обязательные поля.
+- Приложение ожидает корректную структуру массивов `entries/events`; при сильно повреждённых данных может потребоваться предварительная правка JSON.
+- Редактирование, экспорт и генерация данных не поддерживаются (только просмотр).

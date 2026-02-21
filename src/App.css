@@ -1,42 +1,143 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+* {
+  box-sizing: border-box;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.app-shell.single {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.panel.compact p {
+  margin: 6px 0;
+}
+
+.timeline-panel {
+  overflow: auto;
+}
+
+.days-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.day-card {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fafafa;
+}
+
+.panel-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.entry-card {
+  border-left: 3px solid #d1d5db;
+  padding: 8px;
+  margin: 8px 0;
+  background: #fff;
+}
+
+.entry-card.highlight {
+  border-left-color: #2563eb;
+}
+
+.entry-card header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  gap: 12px;
+}
+
+.tree-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tree-node {
+  width: 100%;
+  text-align: left;
+  margin: 4px 0;
+}
+
+.tree-node.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 4px 8px;
+}
+
+.meta-grid dt {
+  font-weight: 700;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.error {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.file-picker {
+  border: 1px dashed #6b7280;
+  border-radius: 8px;
+  display: inline-block;
+  padding: 10px 14px;
+  margin: 8px 0;
+  cursor: pointer;
+}
+
+.upload-panel input[type='file'] {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .app-shell {
+    grid-template-columns: 1fr;
   }
-  to {
-    transform: rotate(360deg);
+
+  .sidebar {
+    max-height: none;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

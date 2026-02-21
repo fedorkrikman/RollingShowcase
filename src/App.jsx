@@ -1,34 +1,80 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useMemo, useState } from 'react'
 import './App.css'
+import FileLoader from './components/FileLoader'
+import NodeDetails from './components/NodeDetails'
+import NodeTree from './components/NodeTree'
+import Timeline from './components/Timeline'
+import { buildShowcaseIndex, parseShowcaseText } from './data/rollingShowcase'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [showcaseData, setShowcaseData] = useState(null)
+  const [selectedNodeId, setSelectedNodeId] = useState(null)
+  const [error, setError] = useState('')
+  const [fileName, setFileName] = useState('')
+
+  const showcaseIndex = useMemo(() => {
+    if (!showcaseData) return null
+    return buildShowcaseIndex(showcaseData)
+  }, [showcaseData])
+
+  const selectedNode = showcaseIndex?.nodeById.get(selectedNodeId) ?? null
+  const relatedLinks = selectedNodeId ? showcaseIndex?.relationsByNode.get(selectedNodeId) ?? [] : []
+
+  const handleFileLoaded = (fileText, nextFileName) => {
+    const parsed = parseShowcaseText(fileText)
+
+    if (!parsed.valid) {
+      setShowcaseData(null)
+      setSelectedNodeId(null)
+      setError(parsed.error)
+      return
+    }
+
+    setError('')
+    setShowcaseData(parsed.data)
+    setSelectedNodeId(null)
+    setFileName(nextFileName)
+  }
+
+  if (!showcaseData) {
+    return (
+      <main className="app-shell single">
+        <FileLoader onFileLoaded={handleFileLoaded} error={error} />
+      </main>
+    )
+  }
+
+  const window = showcaseData.meta.window
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <main className="app-shell">
+      <aside className="sidebar">
+        <section className="panel compact">
+          <h2>Источник</h2>
+          <p>{fileName}</p>
+          <button type="button" onClick={() => setShowcaseData(null)}>
+            Загрузить другой файл
+          </button>
+        </section>
+
+        <section className="panel compact">
+          <h2>Окно</h2>
+          <p>{window.start_date} → {window.end_date}</p>
+          <p>Granularity: {window.granularity_mode}</p>
+          <p>Дней: {showcaseIndex.days.length}</p>
+        </section>
+
+        <NodeTree
+          childrenByParent={showcaseIndex.childrenByParent}
+          selectedNodeId={selectedNodeId}
+          onSelectNode={setSelectedNodeId}
+        />
+
+        <NodeDetails node={selectedNode} relatedLinks={relatedLinks} />
+      </aside>
+
+      <Timeline days={showcaseIndex.days} selectedNodeId={selectedNodeId} />
+    </main>
   )
 }
 
