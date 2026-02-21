@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 function EntryCard({ entry, highlight }) {
   return (
     <article className={`entry-card ${highlight ? 'highlight' : ''}`}>
@@ -14,44 +16,86 @@ function EntryCard({ entry, highlight }) {
   )
 }
 
+const hasEvents = (events) => Array.isArray(events) && events.length > 0
+
+const collectOrphanEvents = (dayEntries, dayOrphan) => {
+  const orphanEventsFromDay = Array.isArray(dayOrphan) ? dayOrphan.filter(Boolean) : []
+  const orphanEventsFromEntries = dayEntries
+    .filter((entry) => entry?.type === 'orphan' && hasEvents(entry?.events))
+    .flatMap((entry) => entry.events)
+
+  return [...orphanEventsFromDay, ...orphanEventsFromEntries]
+}
+
 export default function Timeline({ days, selectedNodeId }) {
+  const visibleDays = useMemo(() => {
+    return days
+      .map((day) => {
+        const entries = Array.isArray(day?.entries) ? day.entries : []
+
+        if (selectedNodeId) {
+          const nodeEntries = entries.filter((entry) => entry?.node_id === selectedNodeId && hasEvents(entry?.events))
+          if (nodeEntries.length === 0) return null
+
+          return {
+            date: day.date,
+            nodeEntries,
+            orphanEvents: [],
+          }
+        }
+
+        const nodeEntries = entries.filter((entry) => entry?.node_id && hasEvents(entry?.events))
+        const orphanEvents = collectOrphanEvents(entries, day?.orphan)
+
+        if (nodeEntries.length === 0 && orphanEvents.length === 0) return null
+
+        return {
+          date: day.date,
+          nodeEntries,
+          orphanEvents,
+        }
+      })
+      .filter(Boolean)
+  }, [days, selectedNodeId])
+
   return (
     <section className="panel timeline-panel">
-      <h2>Таймлайн</h2>
-      <div className="days-list">
-        {days.map((day) => {
-          const nodeEntries = selectedNodeId
-            ? day.entries.filter((entry) => entry.node_id === selectedNodeId)
-            : day.entries
-
-          return (
+      <h2>Timeline</h2>
+      {visibleDays.length === 0 ? (
+        <p className="muted">
+          {selectedNodeId ? 'No events for the selected node in the current window.' : 'No events in the current window.'}
+        </p>
+      ) : (
+        <div className="days-list">
+          {visibleDays.map((day) => (
             <article className="day-card" key={day.date}>
               <header className="panel-header-row">
                 <h3>{day.date}</h3>
-                <span>{nodeEntries.length} entries</span>
+                <span>{day.nodeEntries.length} entries</span>
               </header>
 
-              {nodeEntries.length === 0 ? <p className="muted">Нет событий для выбранного узла.</p> : null}
-              {nodeEntries.map((entry, index) => (
+              {day.nodeEntries.map((entry, index) => (
                 <EntryCard key={`${day.date}-${entry.node_id}-${index}`} entry={entry} highlight={Boolean(selectedNodeId)} />
               ))}
 
-              <div className="orphans">
-                <h4>Orphans</h4>
-                {day.orphan?.length ? (
-                  <ul>
-                    {day.orphan.map((event, index) => (
-                      <li key={`${day.date}-orphan-${index}`}>{event}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="muted">Пусто</p>
-                )}
-              </div>
+              {!selectedNodeId ? (
+                <div className="orphans">
+                  <h4>Orphans</h4>
+                  {day.orphanEvents.length ? (
+                    <ul>
+                      {day.orphanEvents.map((event, index) => (
+                        <li key={`${day.date}-orphan-${index}`}>{event}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="muted">Empty</p>
+                  )}
+                </div>
+              ) : null}
             </article>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   )
 }
